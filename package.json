@@ -1,0 +1,18 @@
+{
+  "name": "textrankr-api-serverless",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Serverless support for AWS Lambda deployment",
+  "scripts": {
+    "start": "serverless offline",
+    "build": "serverless package",
+    "deploy": "serverless deploy"
+  },
+  "author": "jaeyoung.choi <lactrious@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless": "^1.80.0",
+    "serverless-offline": "^6.6.0",
+    "serverless-python-requirements": "^5.1.0"
+  }
+}

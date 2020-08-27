@@ -1,0 +1,26 @@
+service: textrankr-api
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: ${env:AWS_DEFAULT_REGION, "ap-northeast-2"}
+  stage: ${env:STAGE, "dev"}
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+
+package:
+  exclude:
+    - node_modules/**
+    - venv/**
+
+functions:
+  hello:
+    handler: handler.summerize
+    events:
+      - http: POST /summerize
