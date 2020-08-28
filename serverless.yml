@@ -3,16 +3,49 @@ service: textrankr-api
 plugins:
   - serverless-offline
   - serverless-python-requirements
+  - serverless-plugin-warmup
+  - serverless-prune-plugin
 
 provider:
   name: aws
   runtime: python3.8
   region: ${env:AWS_DEFAULT_REGION, "ap-northeast-2"}
   stage: ${env:STAGE, "dev"}
+  environment:
+    PHRASER_API_URL: ${env:PHRASER_API_URL}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+      Resource:
+        - Fn::Join:
+            - ":"
+            - - arn:aws:lambda
+              - Ref: AWS::Region
+              - Ref: AWS::AccountId
+              - function:${self:service}-${self:provider.stage}-*
+  usagePlan:
+    quota:
+      limit: 80000
+      period: DAY
+    throttle:
+      burstLimit: 20
+      rateLimit: 10
 
 custom:
   pythonRequirements:
     dockerizePip: true
+  prune:
+    automatic: true
+    number: 3
+  warmup:
+    enable: true
+    prewarm: true
+    timeout: 30
+    events:
+      - schedule: "rate(10 minutes)"
+    payload:
+      body: "대한민국은 대한민국헌법과 대한민국헌법제1조라는 이름으로서, 대한민국 제1의 최우선 근본 이념을 민주주의로 정하고, 이를 머리와 가슴으로 이해하고, 행동과 실천 과정으로 펼쳐 따르며, 정의 구현 및 경제 성과로 이루기 위한 기본 원리가 국민주권주의임을 제창하고 선언한다."
 
 package:
   exclude:
@@ -20,7 +53,13 @@ package:
     - venv/**
 
 functions:
-  hello:
+  summerize:
     handler: handler.summerize
+    memorySize: 1024
+    timeout: 30
     events:
-      - http: POST /summerize
+      - http:
+          method: post
+          path: /summerize
+          cors: true
+    warmup: true

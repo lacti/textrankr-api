@@ -1,0 +1,3 @@
+#!/bin/bash
+
+export PHRASER_API_URL="https://phraser-api"
